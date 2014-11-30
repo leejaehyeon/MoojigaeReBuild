@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest package="com.panicstyle.Moojigae" xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="1.12.0" android:versionCode="21">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-sdk android:minSdkVersion="9"/>
+
+    <application 
+        android:icon="@drawable/ic_launcher"
+        android:theme="@style/AppTheme"
+        android:label="이충현짱짱맨"
+        android:name="MoojigaeApplication" >
+        <meta-data android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+        <activity android:name="MoojigaeActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name="BoardActivity" />
+        <activity android:name="ItemsActivity" />
+        <activity android:name="RecentItemsActivity" />
+        <activity android:name="ArticleView" />
+        <activity android:name="AboutView" />
+        <activity android:name="SetView" />
+        <activity android:name="ArticleWrite" />
+        <activity android:name="ArticleModify" />
+        <activity android:name="CommentWrite" />
+        <activity android:name="CommentView" />
+        <activity android:name="com.google.android.gms.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"/>
+    </application>
+
+</manifest>
