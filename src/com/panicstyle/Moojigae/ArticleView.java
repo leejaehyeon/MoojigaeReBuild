@@ -83,7 +83,7 @@ public class ArticleView extends Activity implements Runnable {
 		
         intenter();
         
-        Pattern p = Pattern.compile("(?<=boardNo=)(.|\\n)*?(?=&)", Pattern.CASE_INSENSITIVE); 
+        /*Pattern p = Pattern.compile("(?<=boardNo=)(.|\\n)*?(?=&)", Pattern.CASE_INSENSITIVE);
         Matcher m = p.matcher(g_Link);
         
         if (m.find()) { // Find each match in turn; String can't do this.     
@@ -91,7 +91,7 @@ public class ArticleView extends Activity implements Runnable {
         } else {
         	mBoardNo = "";
         }
-        
+        */
         LoadData();
     }
         
@@ -204,14 +204,17 @@ public class ArticleView extends Activity implements Runnable {
     	g_Date = extras.getString("DATE").toString();
     	g_Link = extras.getString("LINK").toString();
     	mBoardID = extras.getString("BOARDID").toString();
+        g_Link = mBoardID + "&" + g_Link;
     }
 
     protected boolean getData(HttpClient httpClient, HttpContext httpContext) {		
-		String url = "http://121.134.211.159/" + g_Link;
+		String url = "http://thegil.org/2014/bbs/board.php?bo_table=" + g_Link;
 		HttpRequest httpRequest = new HttpRequest();
 
-        String result = httpRequest.requestGet(httpClient, httpContext, url, "", "euc-kr");
-
+        String result = httpRequest.requestGet(httpClient, httpContext, url, "", "utf-8");
+        System.out.println("****************************************************");
+        System.out.println(result);
+        System.out.println("****************************************************");
         if (result.indexOf("onclick=\"userLogin()") > 0) {
         	return false;
         }
