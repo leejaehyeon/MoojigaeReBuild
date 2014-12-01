@@ -27,7 +27,7 @@
 	    
 	    <ImageView
 	        android:id="@+id/iconnew"
-	        android:layout_weight="10"
+	        android:layout_weight="6"
 	        android:layout_width="0dip"
 	        android:layout_height="fill_parent" >
 	    </ImageView>
@@ -38,7 +38,7 @@
 	        android:gravity = "left|center_vertical"
 	        android:textSize = "12sp"        
 	        android:drawSelectorOnTop="false" 
-	        android:layout_weight="60"
+	        android:layout_weight="64"
 	        android:textColor="#111111" >         
 	    </TextView>
 
@@ -46,9 +46,9 @@
 	        android:id="@+id/date"
 	        android:layout_width="0dip"
 	        android:layout_height="fill_parent"
-	        android:paddingRight="1dip"
+	        android:paddingRight="10dip"
 	        android:drawSelectorOnTop="false"
-	        android:gravity="left|center_vertical"
+	        android:gravity="right|center_vertical"
 	        android:textColor="#111111"
 	        android:layout_weight="30"
 	        android:textSize="12sp" >
@@ -80,10 +80,10 @@
 	    <TextView android:id="@+id/comment"
 	        android:layout_width="25dip"
 	        android:layout_height="20dip"
-	        android:gravity = "center|center_vertical"        
-	        android:drawSelectorOnTop="false" 
+            android:drawSelectorOnTop="false"
             android:textSize = "13sp"
-            android:textColor="#FFFFFF" >         
+            android:textColor="#FFFFFF"
+            android:gravity="center_vertical|center">
 	    </TextView>
     
     </LinearLayout>
