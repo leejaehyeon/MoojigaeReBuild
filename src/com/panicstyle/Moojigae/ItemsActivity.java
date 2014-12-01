@@ -355,7 +355,9 @@ public class ItemsActivity extends ListActivity implements Runnable {
             Matcher m2 = p2.matcher(matchstr);
 	        if (m2.find()) { // Find each match in turn; String can't do this.     
 	//        	items.add(m.group(0)); // Access a submatch group; String can't do this. }
-	            item.put("link", m2.group(0));
+                String subject = m2.group(0);
+                subject = subject.replaceAll("&amp;", "&");
+	            item.put("link", subject);
                 System.out.println("###############");
                 System.out.println(m2.group());
 	        } else {
@@ -389,7 +391,7 @@ public class ItemsActivity extends ListActivity implements Runnable {
             item.put("subject", subject);
 
 	        // writer
-	        p2 = Pattern.compile("(?<=<td id=tBbsCol7 name=tBbsCol7 width=100 align=center>)(.|\\n)*?(?=</td>)", Pattern.CASE_INSENSITIVE); 
+	        p2 = Pattern.compile("(?<=<span class=\"sv_member\">)(.|\\n)*?(?=</td>)", Pattern.CASE_INSENSITIVE);
 	        m2 = p2.matcher(matchstr);
 	        String writer;
 	        if (m2.find()) { // Find each match in turn; String can't do this.     
@@ -398,12 +400,12 @@ public class ItemsActivity extends ListActivity implements Runnable {
 	        } else {
 	            writer = "";
 	        }
-	        writer = writer.replaceAll("<((.|\\n)*?)+>", "");
+	        writer = writer.replaceAll("</span>", "");
 	        writer = writer.trim();
             writer = item.put("name", writer);
             
 	        // comment
-	        p2 = Pattern.compile("(?<=<font class=fAMemo>)(.|\\n)*?(?=</font>)", Pattern.CASE_INSENSITIVE); 
+	        p2 = Pattern.compile("(?<=<span class=\"cnt_cmt\">)[0-9]+?(?=</span>)", Pattern.CASE_INSENSITIVE);
 	        m2 = p2.matcher(matchstr);
 	        if (m2.find()) { // Find each match in turn; String can't do this.     
 	//        	items.add(m.group(0)); // Access a submatch group; String can't do this. }
@@ -413,7 +415,7 @@ public class ItemsActivity extends ListActivity implements Runnable {
 	        }
             
 	        // date
-	        p2 = Pattern.compile("(?<=class=mdlgray>)\\d\\d\\d\\d-\\d\\d-\\d\\d(?=</td>)", Pattern.CASE_INSENSITIVE); 
+	        p2 = Pattern.compile("(?<=<td class=\"td_date\">)[0-9]{2}(:|-)[0-9]{2}(?=</td>)", Pattern.CASE_INSENSITIVE);
 	        m2 = p2.matcher(matchstr);
 	        String date;
 	        if (m2.find()) { // Find each match in turn; String can't do this.     
@@ -422,8 +424,8 @@ public class ItemsActivity extends ListActivity implements Runnable {
 	        } else {
 	        	date = "";
 	        }
-	        date = date.replaceAll("<((.|\\n)*?)+>", "");
-	        date = date.trim();
+	        //date = date.replaceAll("<((.|\\n)*?)+>", "");
+	        //date = date.trim();
       
             item.put("date", date);
 
