@@ -166,18 +166,26 @@ public class SetView extends Activity {
             serializer.endTag(null, "Password");            
 
             serializer.startTag(null, "test");
-            serializer.endTag(null, "text");
+            serializer.text( "이재현 짱짱맨" );
+            serializer.endTag(null, "test");
 
             serializer.endTag(null, "LoginInfo");
             serializer.endDocument();
             //write xml data into the FileOutputStream
             serializer.flush();
             //finally we close the file stream
-            fileos.close();
-            Toast.makeText(this,  "Save Data", Toast.LENGTH_SHORT).show();
                        
         } catch (Exception e) {
-         	Log.e("Exception","error occurred while creating xml file");
+         	Log.e("Exception", "error occurred while creating xml file");
+        }
+        finally {
+            try {
+                fileos.close( );
+                Toast.makeText(this,  "Save Data", Toast.LENGTH_SHORT).show();
+            }
+            catch(Exception e ) {
+                e.getMessage();
+            }
         }
     }
     

@@ -351,7 +351,7 @@ public class ItemsActivity extends ListActivity implements Runnable {
             }
             
 	        // link
-            Pattern p2 = Pattern.compile("(?<=<a href=)(.|\\n)*?(?=[ ])", Pattern.CASE_INSENSITIVE); 
+            Pattern p2 = Pattern.compile("wr_id=[0-9]+", Pattern.CASE_INSENSITIVE);
             Matcher m2 = p2.matcher(matchstr);
 	        if (m2.find()) { // Find each match in turn; String can't do this.     
 	//        	items.add(m.group(0)); // Access a submatch group; String can't do this. }
@@ -363,12 +363,14 @@ public class ItemsActivity extends ListActivity implements Runnable {
 	        }
 	        
             // subject	
-	        p2 = Pattern.compile("(?<=class=\\\"list\\\">)(.|\\n)*?(?=</a>)", Pattern.CASE_INSENSITIVE); 
+	        p2 = Pattern.compile("(?<=href=\\\">)(.|\\n)*?(?=>)", Pattern.CASE_INSENSITIVE);
 	        m2 = p2.matcher(matchstr);
 	        String subject;
 	        if (m2.find()) { // Find each match in turn; String can't do this.     
 	//        	items.add(m.group(0)); // Access a submatch group; String can't do this. }
 	        	subject = m2.group(0);
+                System.out.println("###############");
+                System.out.println(m2.group());
 	        } else {
 	        	subject = "";
 	        }
