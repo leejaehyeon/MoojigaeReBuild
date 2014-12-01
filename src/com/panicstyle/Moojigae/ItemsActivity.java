@@ -305,7 +305,7 @@ public class ItemsActivity extends ListActivity implements Runnable {
     protected boolean getData(HttpClient httpClient, HttpContext httpContext) {		
 		
     	String Page = Integer.toString(nPage);
-    	String url = "http://thegil.org/2014/bbs/board.php?bo_table=" + itemsLink; //변경
+    	String url = "http://thegil.org/2014/bbs/board.php?bo_table=" + itemsLink + "&page=" + Page; //변경
 		HttpRequest httpRequest = new HttpRequest();
 
         String result = httpRequest.requestPost(httpClient, httpContext, url, null, "", "utf-8");
@@ -351,7 +351,7 @@ public class ItemsActivity extends ListActivity implements Runnable {
             }
             
 	        // link
-            Pattern p2 = Pattern.compile("wr_id=[0-9]+", Pattern.CASE_INSENSITIVE);
+            Pattern p2 = Pattern.compile("wr_id=[0-9]+&amp;page=[0-9]+", Pattern.CASE_INSENSITIVE);
             Matcher m2 = p2.matcher(matchstr);
 	        if (m2.find()) { // Find each match in turn; String can't do this.     
 	//        	items.add(m.group(0)); // Access a submatch group; String can't do this. }
@@ -363,7 +363,8 @@ public class ItemsActivity extends ListActivity implements Runnable {
 	        }
 	        
             // subject	
-	        p2 = Pattern.compile("(?<=href=\\\">)(.|\\n)*?(?=>)", Pattern.CASE_INSENSITIVE);
+	        p2 = Pattern.compile( "(page=[0-9]+\\\">)(.|\\n)*?(?=<)", Pattern.CASE_INSENSITIVE);
+            //p2 = Pattern.compile( "(?<=page=[0-9]+\\\">)(.|\\n)*?(?=<)", Pattern.CASE_INSENSITIVE);
 	        m2 = p2.matcher(matchstr);
 	        String subject;
 	        if (m2.find()) { // Find each match in turn; String can't do this.     
@@ -376,12 +377,14 @@ public class ItemsActivity extends ListActivity implements Runnable {
 	        }
 	        // <[a-zA-Z0-9\\s\\\"/&_=\\.\\?;\\-:]+>
 //	        subject = subject.replaceAll("<((.|\\n)*?)+>", "");
+            subject = subject.replaceAll("page=[0-9]+\\\">", ""); //후방탐색자를 삽입하면 오류가 떠서 따로 처리
 	        subject = subject.replaceAll("&nbsp;", "");
 	        subject = subject.replaceAll("&lt;", "<");
 	        subject = subject.replaceAll("&gt;", ">");
 	        subject = subject.replaceAll("&amp;", "&");
 	        subject = subject.replaceAll("&quot;", "\"");
 	        subject = subject.replaceAll("&apos;", "'");
+            subject = subject.replaceAll("&#039;", "'");
 	        subject = subject.trim();
             item.put("subject", subject);
 
