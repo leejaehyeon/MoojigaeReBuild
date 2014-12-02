@@ -200,6 +200,7 @@ public class ArticleView extends Activity implements Runnable {
     	Bundle extras = getIntent().getExtras();
     	// 가져온 값을 set해주는 부분
     	g_Subject = extras.getString("SUBJECT").toString();
+        System.out.println(g_Subject);
     	g_UserName = extras.getString("USERNAME").toString();
     	g_Date = extras.getString("DATE").toString();
     	g_Link = extras.getString("LINK").toString();
@@ -234,7 +235,8 @@ public class ArticleView extends Activity implements Runnable {
         	mContent = "";
         }
 */
-
+//글제목
+        /*
         Pattern p = Pattern.compile("(?<=<font class=fTitle><b>제목 : <font size=3>)(.|\\n)*?(?=</font>)", Pattern.CASE_INSENSITIVE);
         Matcher m = p.matcher(result);
 
@@ -244,16 +246,20 @@ public class ArticleView extends Activity implements Runnable {
         } else {
             strSubject = "";
         }
+        */
+        Pattern p;
+        Matcher m;
+        String strSubject = g_Subject; //굳이 정규식으로 제목 가져오지말고 intent로 받아온 값 가져오기
+        //int match1, match2;
+        //String strTitle;
+        //match1 = result.indexOf("<td class=fSubTitle>");
+        //if (match1 < 0) return false;
+        //match2 = result.indexOf("<td class=lReadTop></td>", match1);
+        //if (match2 < 0) return false;
+        //strTitle = result.substring(match1, match2);
 
-        int match1, match2;
-        String strTitle;
-
-        match1 = result.indexOf("<td class=fSubTitle>");
-        if (match1 < 0) return false;
-        match2 = result.indexOf("<td class=lReadTop></td>", match1);
-        if (match2 < 0) return false;
-        strTitle = result.substring(match1, match2);
-
+//글쓴이
+        /*
         p = Pattern.compile("(?<=textDecoration='none'>)(.|\\n)*?(?=</font>)", Pattern.CASE_INSENSITIVE);
         m = p.matcher(strTitle);
 
@@ -263,9 +269,12 @@ public class ArticleView extends Activity implements Runnable {
         } else {
             strUser = "";
         }
+        */
+        String strUser = g_UserName;
 
+//date
         p = Pattern.compile("\\d\\d\\d\\d-\\d\\d-\\d\\d.\\d\\d:\\d\\d:\\d\\d", Pattern.CASE_INSENSITIVE);
-        m = p.matcher(strTitle);
+        m = p.matcher(result);
 
         String strUserDate;
         if (m.find()) { // Find each match in turn; String can't do this.
@@ -273,7 +282,10 @@ public class ArticleView extends Activity implements Runnable {
         } else {
             strUserDate = "";
         }
+        strUserDate = g_Date; //임시 문구. 날짜는 yyyy-mm-dd형식으로 되있는 본문안의 날짜를 사용해야한다.
 
+        int match1, match2;//임시
+        String strTitle = result;//여기까지작업
         p = Pattern.compile("(?<=<font style=font-style:italic>)(.|\\n)*?(?=</font>)", Pattern.CASE_INSENSITIVE);
         m = p.matcher(strTitle);
 
