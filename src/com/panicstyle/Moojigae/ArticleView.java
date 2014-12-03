@@ -36,15 +36,15 @@ public class ArticleView extends Activity implements Runnable {
 	/** Called when the activity is first created. */
 //	protected String itemsTitle;
 //	protected String itemsLink;
-	protected String mBoardID;
+	protected String mBoardID; //bo_table 의 값( B11, B12등의 값);
 	protected String mBoardNo;
 	protected HttpClient httpClient;
 	protected HttpContext httpContext;
     private ProgressDialog pd;
     String htmlDoc;
     String mContent;
-    String mContentOrig;
     String mErrorMsg;
+    String mContentOrig; //페이지 html 값
     int nThreadMode = 0;
     boolean bDeleteStatus;
     static final int REQUEST_WRITE = 1;
@@ -53,23 +53,23 @@ public class ArticleView extends Activity implements Runnable {
     static final int REQUEST_COMMENT_REPLY_VIEW = 4;
     static final int REQUEST_COMMENT_DELETE_VIEW = 5;
     String mCommentNo;
-    String mUserID;
+    String mUserID; //로그인 한 아이디
     protected int mLoginStatus;
     private WebView webView;
 	
 	String g_isPNotice;
 	String g_isNotice;
-	String g_Subject;
-	String g_UserName;
+	String g_Subject; //글 제목
+	String g_UserName; //글쓴이
 	String g_UserID;
-	String g_Date;
-	String g_Link;
+	String g_Date; //글 쓴 날짜혹은 시간( 년도 빼고)
+	String g_Link; //wr_id=***값
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main2);
-        webView = (WebView) findViewById(R.id.webView);
+        setContentView(R.layout.main2); 
+        webView = (WebView) findViewById(R.id.webView); //웹뷰를 webView변수에 할당
 
         // Look up the AdView as a resource and load a request.
         AdView adView = (AdView) this.findViewById(R.id.adView);
@@ -79,7 +79,7 @@ public class ArticleView extends Activity implements Runnable {
         MoojigaeApplication app = (MoojigaeApplication)getApplication();
         httpClient = app.httpClient;
         httpContext = app.httpContext;
-        mUserID = app.mUserID;
+        mUserID = app.mUserID; //moojiageActivy참조
 		
         intenter();
         
@@ -108,7 +108,7 @@ public class ArticleView extends Activity implements Runnable {
 
     public void run() {
         if (nThreadMode == 1) {     // Load Data
-            if (!getData(httpClient, httpContext)) {
+            if (!getData(httpClient, httpContext)) { //리턴값이 트루면 게시물 가져오기 성공
                 // Login
                 Login login = new Login();
 
@@ -191,7 +191,7 @@ public class ArticleView extends Activity implements Runnable {
 			ab.show();
 		} else {
 			webView.getSettings().setJavaScriptEnabled(true);
-            webView.loadDataWithBaseURL("http://121.134.211.159", htmlDoc, "text/html", "utf-8", "");
+            webView.loadDataWithBaseURL("http://thegil.org/", htmlDoc, "text/html", "utf-8", "");
 		}
     }
 
@@ -199,13 +199,12 @@ public class ArticleView extends Activity implements Runnable {
 //    	Intent intent = getIntent();  // 값을 가져오는 인텐트 객체생성
     	Bundle extras = getIntent().getExtras();
     	// 가져온 값을 set해주는 부분
-    	g_Subject = extras.getString("SUBJECT").toString();
-        System.out.println(g_Subject);
-    	g_UserName = extras.getString("USERNAME").toString();
-    	g_Date = extras.getString("DATE").toString();
-    	g_Link = extras.getString("LINK").toString();
-    	mBoardID = extras.getString("BOARDID").toString();
-        g_Link = mBoardID + "&" + g_Link;
+    	g_Subject = extras.getString("SUBJECT").toString(); //게시글 제목 반환
+    	g_UserName = extras.getString("USERNAME").toString(); //글쓴이 반환
+    	g_Date = extras.getString("DATE").toString(); //날짜 혹은 시간 반환
+    	g_Link = extras.getString("LINK").toString(); //링크 중 wr_id와 값 반환
+    	mBoardID = extras.getString("BOARDID").toString(); //bo_table의 값만 반환
+        g_Link = mBoardID + "&" + g_Link; //합치기
     }
 
     protected boolean getData(HttpClient httpClient, HttpContext httpContext) {		
@@ -213,108 +212,86 @@ public class ArticleView extends Activity implements Runnable {
 		HttpRequest httpRequest = new HttpRequest();
 
         String result = httpRequest.requestGet(httpClient, httpContext, url, "", "utf-8");
-        System.out.println("****************************************************");
+        System.out.println("****************************************************#");
         System.out.println(result);
-        System.out.println("****************************************************");
-        if (result.indexOf("onclick=\"userLogin()") > 0) {
-        	return false;
+        System.out.println("****************************************************#");
+        if( result.indexOf( "<div id=\"hd_login_msg\">" ) == 0 ) {
+            System.out.println("Login Fail");
+
+            return false;
         }
         mContentOrig = result;
         
+        Pattern p = null;
+        Matcher m = null;
 
-/*
-        #1 일부 알수 없는 게시글에 대해서 패턴매칭이 안됨
-//      Pattern p = Pattern.compile("(?<=<!-- 게시물 레코드 반복-->)(.|\\n)*?(?=<!-- 메모 입력 -->)", Pattern.CASE_INSENSITIVE); 
-        Pattern p = Pattern.compile("(<!-- 내용 -->)(.|\\n)*?(<!-- 메모 입력 -->)", Pattern.CASE_INSENSITIVE);
+        String strSubject = null; //글제목
+        String strUser = null; //글쓴이
+        String strUserDate = null; //글 쓴 날짜
+        String strHit = null; //조회수
+        String strCommentNum = null; //댓글수
+        String strAttach = null; //첨부파일
 
-        Matcher m = p.matcher(result);
-        
-        if (m.find()) { // Find each match in turn; String can't do this.     
-        	mContent = m.group(0);
-        } else {
-        	mContent = "";
-        }
-*/
 //글제목
-        /*
-        Pattern p = Pattern.compile("(?<=<font class=fTitle><b>제목 : <font size=3>)(.|\\n)*?(?=</font>)", Pattern.CASE_INSENSITIVE);
-        Matcher m = p.matcher(result);
-
-        String strSubject;
-        if (m.find()) { // Find each match in turn; String can't do this.
-            strSubject = m.group(0);
-        } else {
-            strSubject = "";
-        }
-        */
-        Pattern p;
-        Matcher m;
-        String strSubject = g_Subject; //굳이 정규식으로 제목 가져오지말고 intent로 받아온 값 가져오기
-        //int match1, match2;
-        //String strTitle;
-        //match1 = result.indexOf("<td class=fSubTitle>");
-        //if (match1 < 0) return false;
-        //match2 = result.indexOf("<td class=lReadTop></td>", match1);
-        //if (match2 < 0) return false;
-        //strTitle = result.substring(match1, match2);
+        strSubject = g_Subject;
 
 //글쓴이
-        /*
-        p = Pattern.compile("(?<=textDecoration='none'>)(.|\\n)*?(?=</font>)", Pattern.CASE_INSENSITIVE);
+        strUser = g_UserName;
+
+        int match1, match2;
+        String strTitle;
+        match1 = result.indexOf("<section id=\"bo_v_info\">");
+        if (match1 < 0) return false;
+        match2 = result.indexOf("</section>", match1);
+        if (match2 < 0) return false;
+        strTitle = result.substring(match1, match2);
+        System.out.println("!!!!!!!!!!!!");
+//글 쓴 날짜
+        p = Pattern.compile("(\\d\\d-){2}\\d\\d \\d\\d:\\d\\d", Pattern.CASE_INSENSITIVE);
         m = p.matcher(strTitle);
-
-        String strUser;
-        if (m.find()) { // Find each match in turn; String can't do this.
-            strUser = m.group(0);
-        } else {
-            strUser = "";
-        }
-        */
-        String strUser = g_UserName;
-
-//date
-        p = Pattern.compile("\\d\\d\\d\\d-\\d\\d-\\d\\d.\\d\\d:\\d\\d:\\d\\d", Pattern.CASE_INSENSITIVE);
-        m = p.matcher(result);
-
-        String strUserDate;
         if (m.find()) { // Find each match in turn; String can't do this.
             strUserDate = m.group(0);
         } else {
             strUserDate = "";
         }
-        strUserDate = g_Date; //임시 문구. 날짜는 yyyy-mm-dd형식으로 되있는 본문안의 날짜를 사용해야한다.
-
-        int match1, match2;//임시
-        String strTitle = result;//여기까지작업
-        p = Pattern.compile("(?<=<font style=font-style:italic>)(.|\\n)*?(?=</font>)", Pattern.CASE_INSENSITIVE);
+//조회수
+        p = Pattern.compile("(?<=조회<strong>)\\d+(?=회</strong>)", Pattern.CASE_INSENSITIVE);
         m = p.matcher(strTitle);
 
-        String strHit;
         if (m.find()) { // Find each match in turn; String can't do this.
             strHit = m.group(0);
         } else {
             strHit = "";
         }
+//댓글수
+        p = Pattern.compile("(?<=댓글<strong>)\\d+(?=회</strong>)", Pattern.CASE_INSENSITIVE);
+        m = p.matcher(strTitle);
+
+        if (m.find()) { // Find each match in turn; String can't do this.
+            strCommentNum = m.group(0);
+        } else {
+            strCommentNum = "";
+        }
 
         strTitle = "<div class='title'>" + strSubject + "</div><div class='name'><span>" + strUser + "</span>&nbsp;&nbsp;<span>" + strUserDate + "</span>&nbsp;&nbsp;<span>" + strHit + "</span>명이 읽음</div>";
 
-
-        match1 = result.indexOf("<!-- 내용 -->");
+//본문 체크
+        match1 = result.indexOf("<div id=\"bo_v_img\">");
         if (match1 < 0) return false;
-        match2 = result.indexOf("<!-- 투표 -->", match1);
+        match2 = result.indexOf("<!-- } 본문 내용 끝 -->", match1);
         if (match2 < 0) return false;
+        System.out.println( "@@@@@@@@@@@@@" );
         mContent = result.substring(match1, match2);
-
 //        mContent = mContent.replaceAll("<meta http-equiv=\\\"Content-Type\\\" content=\\\"text/html; charset=euc-kr\\\">", "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=euc-kr\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, target-densitydpi=medium-dpi\">");
-        mContent = mContent.replaceAll("<td width=200 align=right class=fMemoSmallGray>", "<!--");
+       /* mContent = mContent.replaceAll("<td width=200 align=right class=fMemoSmallGray>", "<!--");
         mContent = mContent.replaceAll("<td width=10></td>", "-->");
         mContent = mContent.replaceAll("<!-- 메모에 대한 답변 -->", "<!--");
         mContent = mContent.replaceAll("<!-- <font class=fMemoSmallGray>", "--><!--");
         mContent = mContent.replaceAll("<nobr class=bbscut id=subjectTtl name=subjectTtl>", "");
-        mContent = mContent.replaceAll("</nobr>", "");
+        mContent = mContent.replaceAll("</nobr>", "");*/
         mContent = "<div class='content'>" + mContent + "</div>";
 
-        p = Pattern.compile("(<IMG style=)(.|\\n)*?(>)", Pattern.CASE_INSENSITIVE);
+       /* p = Pattern.compile("(<IMG style=)(.|\\n)*?(>)", Pattern.CASE_INSENSITIVE);
         m = p.matcher(mContent);
         while (m.find()) { // Find each match in turn; String can't do this.     
             String matchstr = m.group(0);
@@ -329,15 +306,21 @@ public class ArticleView extends Activity implements Runnable {
             	mContent = mContent.replaceFirst("(<IMG style=)(.|\\n)*?(>)", img);
             }
         }
-
-        match1 = result.indexOf("<!-- 업로드 파일 정보  수정본 Edit By Yang --> ");
-        if (match1 < 0) return false;
-        match2 = result.indexOf("<!-- 평가 -->", match1);
-        if (match2 < 0) return false;
-        String strAttach = result.substring(match1, match2);
+        */ //이미지 관련 기능 나중에 구현
+        p = Pattern.compile("(?<=<!-- 첨부파일 시작 \\{ -->)(.|\\n)*?(?=<!-- \\} 첨부파일 끝 -->)", Pattern.CASE_INSENSITIVE);
+        m = p.matcher(result);
+        if (m.find()) { // Find each match in turn; String can't do this.
+            strAttach = m.group(0);
+        } else {
+            strAttach = "";
+        }
+        /*match1 = result.indexOf("<!-- 첨부파일 시작 { -->");
+        match2 = result.indexOf("<!-- } 첨부파일 끝 -->", match1);
+        System.out.println("###############");
+        strAttach = result.substring(match1, match2);*/
         strAttach = "<div class='attach'>" + strAttach + "</div>";
 
-        match1 = result.indexOf("<!-- 별점수 -->");
+        /*match1 = result.indexOf("<!-- 별점수 -->");
         if (match1 < 0) return false;
         match2 = result.indexOf("<!-- 관련글 -->", match1);
         if (match2 < 0) return false;
@@ -351,12 +334,13 @@ public class ArticleView extends Activity implements Runnable {
         } else {
             strProfile = "None";
         }
-        strProfile = "<div class='profile'>" + strProfile + "</div>";
+        strProfile = "<div class='profile'>" + strProfile + "</div>";*/
 
-        match1 = result.indexOf("<!-- 메모글 반복 -->");
+        match1 = result.indexOf("<!-- 댓글 시작 { -->");
         if (match1 < 0) return false;
-        match2 = result.indexOf("<!-- 메모 입력 -->", match1);
+        match2 = result.indexOf("<!-- } 댓글 끝 -->", match1);
         if (match2 < 0) return false;
+        System.out.println("%%%%%%%%%%");
         String mComment_str = result.substring(match1, match2);
 
         String mComment = "";
@@ -430,7 +414,7 @@ public class ArticleView extends Activity implements Runnable {
 //        String cssStr = "<link href=\"./css/default.css\" rel=\"stylesheet\">";
         String strBody = "<body>";
 
-    	htmlDoc = strHeader + strTitle + strResize + strBody + mContent + strAttach + strProfile + mComment + strBottom;
+    	htmlDoc = strHeader + strTitle + strResize + strBody + mContent + strAttach + mComment + strBottom;
 
         return true;
     }
