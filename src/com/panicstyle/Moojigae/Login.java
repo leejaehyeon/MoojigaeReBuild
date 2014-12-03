@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.params.ClientPNames;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HttpContext;
 import org.xmlpull.v1.XmlPullParser;
@@ -115,17 +116,19 @@ public class Login {
 		nameValuePairs.add(new BasicNameValuePair("mb_id", userID));//변경
 		nameValuePairs.add(new BasicNameValuePair("mb_password", userPW));//변경
 		//요소지움 변경
+        httpClient.getParams().setParameter(ClientPNames.ALLOW_CIRCULAR_REDIRECTS, true);
+
 		httpRequest.requestGet(httpClient, httpContext, logoutURL, referer, "utf-8");//인코딩 변경
-		
 		String result = httpRequest.requestPost(httpClient, httpContext, url, nameValuePairs, referer, "utf-8");//인코딩 변경
         System.out.println("***********************************************************");
         System.out.println(result);
         System.out.println("***********************************************************");
-        if (result.length( ) < 1 ) { //로그인 성공시 응답되는 데이타가 없다. 실패시는 html요소가 좌르륵 뜬다. 변경
-	    	System.out.println("Login Success");
 
-			return 1;
-		} else {
+        if( result.indexOf( "<div id=\"hd_login_msg\">" ) > 0 ) {
+            System.out.println( "Login Success" );
+
+            return 1;
+        } else {
 			String errMsg = "Login Fail";
             Log.i("tag", "Login Fail");
 	    	System.out.println(errMsg);
